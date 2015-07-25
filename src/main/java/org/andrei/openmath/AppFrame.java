@@ -21,7 +21,6 @@ import uk.ac.ed.ph.snuggletex.SnuggleEngine;
 import uk.ac.ed.ph.snuggletex.SnuggleSession;
 import java.io.IOException;
 
-import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import javax.imageio.ImageIO;
@@ -32,25 +31,44 @@ public class AppFrame extends JFrame {
     private Icon displayPhoto;
     private JLabel photographLabel = new JLabel();
 
-    public AppFrame() {
+    public AppFrame() throws Exception {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         JLabel emptyLabel = new JLabel("");
         emptyLabel.setPreferredSize(new Dimension(355, 355));
+        
         getContentPane().add(emptyLabel, BorderLayout.CENTER);
         try {
             img = ImageIO.read(new File("test1.jpg"));
         } catch (IOException e) {
             e.printStackTrace();
         }
-        displayPhoto = new ImageIcon(img);
+        //net.sourceforge.jeuclid.MathMLParserSupport
+        
+          /* Parse some very basic Math Mode input */
+        
+        SnuggleEngine engine = new SnuggleEngine();
+        SnuggleSession session = engine.createSession();
+        SnuggleInput input = new SnuggleInput("$$ x^3+y^5+2=3 $$");
+        session.parseInput(input);
+
+        /* Convert the results to an XML String, which in this case will
+         * be a single MathML <math>...</math> element. */
+        String xmlString = session.buildXMLString();
+        Document doc = net.sourceforge.jeuclid.MathMLParserSupport.parseString(xmlString);
+        //System.out.println("Input " + input.getString() + " was converted to:\n" + xmlString);
+        
+        MutableLayoutContext params = new LayoutContextImpl(LayoutContextImpl.getDefaultLayoutContext());
+        BufferedImage bi = Converter.getInstance().render(doc, params);
+
+        displayPhoto = new ImageIcon(bi);
         emptyLabel.setIcon(displayPhoto);
         //Display the window.
         pack();
         setVisible(true);
     }
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException , Exception{
         //Schedule a job for the event-dispatching thread:
         //creating and showing this application's GUI.
         AppFrame app = new AppFrame();
