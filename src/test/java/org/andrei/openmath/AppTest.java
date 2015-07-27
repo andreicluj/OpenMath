@@ -23,6 +23,10 @@ import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.math.BigDecimal;
+import java.sql.Date;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import net.sourceforge.jeuclid.elements.generic.DocumentElement;
 import org.andrei.entity.Problem;
 
@@ -51,7 +55,7 @@ public class AppTest
     /**
      * Rigourous Test :-)
      */
-    public void testApp() {
+    public void testApp() throws ParseException {
         SessionFactory sessionFactory = new Configuration().configure()
                 .buildSessionFactory();
         Session session = sessionFactory.openSession();
@@ -60,8 +64,11 @@ public class AppTest
         AppUser user = new AppUser("firstuser");
         session.save(user);
         
-        Problem p = new Problem(new BigDecimal(1));
+        Problem p = new Problem();
         p.setProblemtext("$$ x^3+y^5+2=3 $$");
+        DateFormat df = new SimpleDateFormat("dd/MM/YYYY");
+        java.util.Date currrentDate = (java.util.Date)df.parse("5/5/2015");
+        p.setPublishdate(new Date(currrentDate.getTime()));
         session.save(p);
 
         session.getTransaction().commit();
