@@ -22,7 +22,13 @@ import uk.ac.ed.ph.snuggletex.SnuggleSession;
 import java.io.IOException;
 
 import java.awt.image.BufferedImage;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import javax.imageio.ImageIO;
 
 public class AppFrame extends JFrame {
@@ -36,7 +42,7 @@ public class AppFrame extends JFrame {
 
         JLabel emptyLabel = new JLabel("");
         emptyLabel.setPreferredSize(new Dimension(355, 355));
-        
+
         getContentPane().add(emptyLabel, BorderLayout.CENTER);
         try {
             img = ImageIO.read(new File("test1.jpg"));
@@ -44,9 +50,8 @@ public class AppFrame extends JFrame {
             e.printStackTrace();
         }
         //net.sourceforge.jeuclid.MathMLParserSupport
-        
-          /* Parse some very basic Math Mode input */
-        
+
+        /* Parse some very basic Math Mode input */
         SnuggleEngine engine = new SnuggleEngine();
         SnuggleSession session = engine.createSession();
         SnuggleInput input = new SnuggleInput("$$ x^3+y^5+2=3 $$");
@@ -55,9 +60,25 @@ public class AppFrame extends JFrame {
         /* Convert the results to an XML String, which in this case will
          * be a single MathML <math>...</math> element. */
         String xmlString = session.buildXMLString();
-        Document doc = net.sourceforge.jeuclid.MathMLParserSupport.parseString(xmlString);
+        Path p = Paths.get("ex1.txt");
+        //InputStream in = Files.newInputStream(p);
+        //BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+        Path file = Paths.get("ex1.txt");
+        String latexText ="";
+        try (InputStream in = Files.newInputStream(file);
+                BufferedReader reader = new BufferedReader(new InputStreamReader(in))) {
+            String line = null;
+            while ((line = reader.readLine()) != null) {
+                latexText+=line + "\n";
+                System.out.println(line);
+            }
+        } catch (IOException x) {
+            System.err.println(x);
+        }
+
+        Document doc = net.sourceforge.jeuclid.MathMLParserSupport.parseString(latexText);
         //System.out.println("Input " + input.getString() + " was converted to:\n" + xmlString);
-        
+
         MutableLayoutContext params = new LayoutContextImpl(LayoutContextImpl.getDefaultLayoutContext());
         BufferedImage bi = Converter.getInstance().render(doc, params);
 
@@ -68,7 +89,7 @@ public class AppFrame extends JFrame {
         setVisible(true);
     }
 
-    public static void main(String[] args) throws IOException , Exception{
+    public static void main(String[] args) throws IOException, Exception {
         //Schedule a job for the event-dispatching thread:
         //creating and showing this application's GUI.
         AppFrame app = new AppFrame();
