@@ -22,6 +22,9 @@ import org.w3c.dom.svg.SVGDocument;
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.math.BigDecimal;
+import net.sourceforge.jeuclid.elements.generic.DocumentElement;
+import org.andrei.entity.Problem;
 
 import org.junit.Assert;
 //import org.junit.Test;
@@ -56,6 +59,10 @@ public class AppTest
 
         AppUser user = new AppUser("firstuser");
         session.save(user);
+        
+        Problem p = new Problem(new BigDecimal(1));
+        p.setProblemtext("$$ x^3+y^5+2=3 $$");
+        session.save(p);
 
         session.getTransaction().commit();
         session.close();
@@ -99,8 +106,31 @@ public class AppTest
      * @throws Exception if the test fails.
      */
 
-    public void testConverterJPG() throws Exception {
+    public void ttestConverterJPG() throws Exception {
         this.testConverterXXX("jpg", "jpeg");
     }
+    
+    
+    /**
+         * Tests if rendered creates a buffered image for an empty document.
+        *
+        * @throws Exception
+         *             if the test fails.
+         */
+      
+        public void ttestConverterBufferedImageEmptyDoc() throws Exception {
+            final Document doc = new DocumentElement();
+    
+            final MutableLayoutContext params = new LayoutContextImpl(
+                    LayoutContextImpl.getDefaultLayoutContext());
+            final BufferedImage bi = Converter.getInstance().render(doc, params);
+            Assert.assertNotNull(bi);
+        }
+    
+    
+    
+    
+    
+    
 
 }
