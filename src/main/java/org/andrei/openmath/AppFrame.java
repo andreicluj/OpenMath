@@ -36,6 +36,8 @@ public class AppFrame extends JFrame {
     BufferedImage img = null;
     private Icon displayPhoto;
     private JLabel photographLabel = new JLabel();
+    net.sourceforge.jeuclid.swing.JMathComponent mathComp;
+    
 
     public AppFrame() throws Exception {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -50,7 +52,7 @@ public class AppFrame extends JFrame {
             e.printStackTrace();
         }
         //net.sourceforge.jeuclid.MathMLParserSupport
-
+        //mathComp = net.sourceforge.jeuclid.swing.JMathComponent();
         /* Parse some very basic Math Mode input */
         SnuggleEngine engine = new SnuggleEngine();
         SnuggleSession session = engine.createSession();
@@ -80,6 +82,7 @@ public class AppFrame extends JFrame {
         //System.out.println("Input " + input.getString() + " was converted to:\n" + xmlString);
 
         MutableLayoutContext params = new LayoutContextImpl(LayoutContextImpl.getDefaultLayoutContext());
+        params.setParameter(Parameter.MATHSIZE, 50f);
         BufferedImage bi = Converter.getInstance().render(doc, params);
 
         displayPhoto = new ImageIcon(bi);
