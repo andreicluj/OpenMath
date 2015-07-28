@@ -37,14 +37,30 @@ public class AppFrame extends JFrame {
     private Icon displayPhoto;
     private JLabel photographLabel = new JLabel();
     net.sourceforge.jeuclid.swing.JMathComponent mathComp;
+    protected JLabel formulaLabel = new JLabel("Type formula bellow :");
+    protected JTextArea textArea = new JTextArea(5, 20);
+    protected JScrollPane scrollPanelForText = new JScrollPane(textArea);
+    protected JButton  displayFormula = new JButton("Display formula");
+    JPanel inputPanel= new JPanel();
+    
     
 
     public AppFrame() throws Exception {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
+        inputPanel.setLayout(new BoxLayout(inputPanel, BoxLayout.PAGE_AXIS));
         JLabel emptyLabel = new JLabel("");
         emptyLabel.setPreferredSize(new Dimension(355, 355));
+        inputPanel.add(formulaLabel  );
+        formulaLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
+        inputPanel.add(Box.createRigidArea(new Dimension(0,5)));
+        inputPanel.add(scrollPanelForText);
+        inputPanel.add(Box.createRigidArea(new Dimension(0,5)));
+        displayFormula.setAlignmentX(Component.LEFT_ALIGNMENT);
+        inputPanel.add(displayFormula);
+        inputPanel.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
+
+        getContentPane().add(inputPanel ,BorderLayout.NORTH);
         getContentPane().add(emptyLabel, BorderLayout.CENTER);
         try {
             img = ImageIO.read(new File("test1.jpg"));
