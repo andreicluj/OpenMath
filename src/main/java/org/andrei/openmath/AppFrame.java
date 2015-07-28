@@ -29,9 +29,13 @@ import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.imageio.ImageIO;
+import javax.xml.parsers.ParserConfigurationException;
+import org.xml.sax.SAXException;
 
-public class AppFrame extends JFrame {
+public class AppFrame extends JFrame implements ActionListener {
 
     BufferedImage img = null;
     private Icon displayPhoto;
@@ -40,77 +44,44 @@ public class AppFrame extends JFrame {
     protected JLabel formulaLabel = new JLabel("Type formula bellow :");
     protected JTextArea textArea = new JTextArea(5, 20);
     protected JScrollPane scrollPanelForText = new JScrollPane(textArea);
-    protected JButton  displayFormula = new JButton("Display formula");
-    JPanel inputPanel= new JPanel();
-    
-    
+    protected JButton displayFormula = new JButton("Display formula");
+            JLabel emptyLabel = new JLabel("");
+
+    JPanel inputPanel = new JPanel();
+
+    protected String xmlString;
 
     public AppFrame() throws Exception {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         inputPanel.setLayout(new BoxLayout(inputPanel, BoxLayout.PAGE_AXIS));
-        JLabel emptyLabel = new JLabel("");
         emptyLabel.setPreferredSize(new Dimension(355, 355));
         JPanel northPanel = new JPanel();
-        northPanel.setLayout(new BoxLayout(northPanel , BoxLayout.LINE_AXIS));
+        northPanel.setLayout(new BoxLayout(northPanel, BoxLayout.LINE_AXIS));
         northPanel.add(formulaLabel);
         northPanel.add(Box.createHorizontalGlue());
         inputPanel.add(northPanel);
-        
+
         //formulaLabel.setAlignmentX(Component.RIGHT_ALIGNMENT);
-        
         formulaLabel.setLabelFor(scrollPanelForText);
 
-        inputPanel.add(Box.createRigidArea(new Dimension(0,5)));
+        inputPanel.add(Box.createRigidArea(new Dimension(0, 5)));
         inputPanel.add(scrollPanelForText);
-        inputPanel.add(Box.createRigidArea(new Dimension(0,5)));
-        displayFormula.setAlignmentX(Component.LEFT_ALIGNMENT);
-        inputPanel.add(displayFormula);
-        inputPanel.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
+        inputPanel.add(Box.createRigidArea(new Dimension(0, 5)));
+        JPanel southPanel = new JPanel();
+        southPanel.setLayout(new BoxLayout(southPanel, BoxLayout.LINE_AXIS));
+        southPanel.add(displayFormula);
+        southPanel.add(Box.createHorizontalGlue());
+        displayFormula.addActionListener(this);
+        displayFormula.setActionCommand("display");
+        //displayFormula.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        getContentPane().add(inputPanel ,BorderLayout.NORTH);
+        inputPanel.add(southPanel);
+        inputPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+        getContentPane().add(inputPanel, BorderLayout.NORTH);
         getContentPane().add(emptyLabel, BorderLayout.CENTER);
-        try {
-            img = ImageIO.read(new File("test1.jpg"));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        //net.sourceforge.jeuclid.MathMLParserSupport
-        //mathComp = net.sourceforge.jeuclid.swing.JMathComponent();
-        /* Parse some very basic Math Mode input */
-        SnuggleEngine engine = new SnuggleEngine();
-        SnuggleSession session = engine.createSession();
-        SnuggleInput input = new SnuggleInput("$$ x^3+y^5+2=3 $$");
-        session.parseInput(input);
+ 
 
-        /* Convert the results to an XML String, which in this case will
-         * be a single MathML <math>...</math> element. */
-        String xmlString = session.buildXMLString();
-        Path p = Paths.get("ex1.txt");
-        //InputStream in = Files.newInputStream(p);
-        //BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-        Path file = Paths.get("ex1.txt");
-        String latexText ="";
-        try (InputStream in = Files.newInputStream(file);
-                BufferedReader reader = new BufferedReader(new InputStreamReader(in))) {
-            String line = null;
-            while ((line = reader.readLine()) != null) {
-                latexText+=line + "\n";
-                System.out.println(line);
-            }
-        } catch (IOException x) {
-            System.err.println(x);
-        }
-
-        Document doc = net.sourceforge.jeuclid.MathMLParserSupport.parseString(latexText);
-        //System.out.println("Input " + input.getString() + " was converted to:\n" + xmlString);
-
-        MutableLayoutContext params = new LayoutContextImpl(LayoutContextImpl.getDefaultLayoutContext());
-        params.setParameter(Parameter.MATHSIZE, 50f);
-        BufferedImage bi = Converter.getInstance().render(doc, params);
-
-        displayPhoto = new ImageIcon(bi);
-        emptyLabel.setIcon(displayPhoto);
-        //Display the window.
         pack();
         setVisible(true);
     }
@@ -144,6 +115,37 @@ public class AppFrame extends JFrame {
         } else {
             System.err.println("Couldn't find file: " + path);
             return null;
+        }
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        if ("display".equals(e.getActionCommand())) {
+            try {
+                System.out.println("display formula out");
+                SnuggleEngine engine = new SnuggleEngine();
+                SnuggleSession session = engine.createSession();
+                SnuggleInput input = new SnuggleInput(textArea.getText());
+                session.parseInput(input);
+                xmlString = session.buildXMLString();
+                Document doc = net.sourceforge.jeuclid.MathMLParserSupport.parseString(xmlString);
+                //System.out.println("Input " + input.getString() + " was converted to:\n" + xmlString);
+
+                MutableLayoutContext params = new LayoutContextImpl(LayoutContextImpl.getDefaultLayoutContext());
+                params.setParameter(Parameter.MATHSIZE, 50f);
+                BufferedImage bi = Converter.getInstance().render(doc, params);
+
+                displayPhoto = new ImageIcon(bi);
+                
+                emptyLabel.setIcon(displayPhoto);
+
+            } catch (IOException ioexc) {
+                ioexc.printStackTrace();
+            } catch (SAXException ex) {
+                Logger.getLogger(AppFrame.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (ParserConfigurationException ex) {
+                Logger.getLogger(AppFrame.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
     }
 
