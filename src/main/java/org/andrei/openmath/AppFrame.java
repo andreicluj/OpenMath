@@ -50,8 +50,15 @@ public class AppFrame extends JFrame {
         inputPanel.setLayout(new BoxLayout(inputPanel, BoxLayout.PAGE_AXIS));
         JLabel emptyLabel = new JLabel("");
         emptyLabel.setPreferredSize(new Dimension(355, 355));
-        inputPanel.add(formulaLabel  );
-        formulaLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        JPanel northPanel = new JPanel();
+        northPanel.setLayout(new BoxLayout(northPanel , BoxLayout.LINE_AXIS));
+        northPanel.add(formulaLabel);
+        northPanel.add(Box.createHorizontalGlue());
+        inputPanel.add(northPanel);
+        
+        //formulaLabel.setAlignmentX(Component.RIGHT_ALIGNMENT);
+        
+        formulaLabel.setLabelFor(scrollPanelForText);
 
         inputPanel.add(Box.createRigidArea(new Dimension(0,5)));
         inputPanel.add(scrollPanelForText);
