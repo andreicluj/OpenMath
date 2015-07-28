@@ -45,7 +45,7 @@ public class AppFrame extends JFrame implements ActionListener {
     protected JTextArea textArea = new JTextArea(5, 20);
     protected JScrollPane scrollPanelForText = new JScrollPane(textArea);
     protected JButton displayFormula = new JButton("Display formula");
-            JLabel emptyLabel = new JLabel("");
+    JLabel emptyLabel = new JLabel("");
 
     JPanel inputPanel = new JPanel();
 
@@ -80,7 +80,6 @@ public class AppFrame extends JFrame implements ActionListener {
 
         getContentPane().add(inputPanel, BorderLayout.NORTH);
         getContentPane().add(emptyLabel, BorderLayout.CENTER);
- 
 
         pack();
         setVisible(true);
@@ -136,7 +135,7 @@ public class AppFrame extends JFrame implements ActionListener {
                 BufferedImage bi = Converter.getInstance().render(doc, params);
 
                 displayPhoto = new ImageIcon(bi);
-                
+
                 emptyLabel.setIcon(displayPhoto);
 
             } catch (IOException ioexc) {

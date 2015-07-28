@@ -103,5 +103,11 @@
             <version>2.5.2</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>org.scilab.forge.jlatexmath</groupId>
+            <artifactId>jlatexmath</artifactId>
+            <version>1.0.3</version>
+            <type>jar</type>
+        </dependency>
     </dependencies>
 </project>
