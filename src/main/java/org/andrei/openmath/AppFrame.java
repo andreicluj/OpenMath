@@ -35,6 +35,10 @@ import javax.imageio.ImageIO;
 import javax.xml.parsers.ParserConfigurationException;
 import org.xml.sax.SAXException;
 
+import org.scilab.forge.jlatexmath.TeXConstants;
+import org.scilab.forge.jlatexmath.TeXFormula;
+import org.scilab.forge.jlatexmath.TeXIcon;
+
 public class AppFrame extends JFrame implements ActionListener {
 
     BufferedImage img = null;
@@ -50,6 +54,8 @@ public class AppFrame extends JFrame implements ActionListener {
     JPanel inputPanel = new JPanel();
 
     protected String xmlString;
+    //private JPanel drawingArea = new JPanel();
+    
 
     public AppFrame() throws Exception {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -120,31 +126,28 @@ public class AppFrame extends JFrame implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         if ("display".equals(e.getActionCommand())) {
-            try {
-                System.out.println("display formula out");
-                SnuggleEngine engine = new SnuggleEngine();
-                SnuggleSession session = engine.createSession();
-                SnuggleInput input = new SnuggleInput(textArea.getText());
-                session.parseInput(input);
-                xmlString = session.buildXMLString();
-                Document doc = net.sourceforge.jeuclid.MathMLParserSupport.parseString(xmlString);
-                //System.out.println("Input " + input.getString() + " was converted to:\n" + xmlString);
+            String latex = textArea.getText();
+            TeXFormula formula = new TeXFormula(latex);
+            TeXIcon icon = formula
+                    .createTeXIcon(TeXConstants.STYLE_DISPLAY, 20);
+            icon.setInsets(new Insets(5, 5, 5, 5));
+            BufferedImage image = new BufferedImage(icon.getIconWidth(),
+                    icon.getIconHeight(), BufferedImage.TYPE_INT_ARGB);
 
-                MutableLayoutContext params = new LayoutContextImpl(LayoutContextImpl.getDefaultLayoutContext());
-                params.setParameter(Parameter.MATHSIZE, 50f);
-                BufferedImage bi = Converter.getInstance().render(doc, params);
+            Graphics2D g2 = image.createGraphics();
+            g2.setColor(Color.white);
+            g2.fillRect(0, 0, icon.getIconWidth(), icon.getIconHeight());
+            JLabel jl = new JLabel();
+            jl.setForeground(new Color(0, 0, 0));
+            icon.paintIcon(jl, g2, 0, 0);
+			// at this point the image is created, you could also save it with ImageIO
 
-                displayPhoto = new ImageIcon(bi);
+            // now draw it to the screen			
+            Graphics g = this.emptyLabel.getGraphics();
+            g.drawImage(image, 0, 0, null);
 
-                emptyLabel.setIcon(displayPhoto);
-
-            } catch (IOException ioexc) {
-                ioexc.printStackTrace();
-            } catch (SAXException ex) {
-                Logger.getLogger(AppFrame.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (ParserConfigurationException ex) {
-                Logger.getLogger(AppFrame.class.getName()).log(Level.SEVERE, null, ex);
-            }
+            //displayPhoto = new ImageIcon(image);
+            //emptyLabel.setIcon(displayPhoto);
         }
     }
 
